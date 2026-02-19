@@ -3,25 +3,21 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         TabView {
-            
             DashboardView()
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("Home")
                 }
-            
             MindView()
                 .tabItem {
                     Image(systemName: "brain.head.profile")
                     Text("Mind")
                 }
-            
             HealthView()
                 .tabItem {
                     Image(systemName: "heart.fill")
                     Text("Health")
                 }
-            
             SettingsView()
                 .tabItem {
                     Image(systemName: "gearshape.fill")
@@ -33,10 +29,11 @@ struct ContentView: View {
 }
 
 struct DashboardView: View {
+    @AppStorage("userName") var name = ""
     var body: some View {
         NavigationView {
-            VStack {
-                Text("Welcome Back")
+            VStack(spacing: 10) {
+                Text("Welcome Back, \(name)")
                     .font(.title)
                 Text("Your daily summary will appear here.")
                     .foregroundColor(.gray)
@@ -45,6 +42,7 @@ struct DashboardView: View {
         }
     }
 }
+
 
 struct MindView: View {
     var body: some View {
@@ -69,14 +67,18 @@ struct HealthView: View {
         }
     }
 }
-
 struct SettingsView: View {
     var body: some View {
         NavigationView {
-            VStack {
+            VStack(spacing: 20) {
                 Text("App Settings")
                     .font(.title)
+                Button("Send Test Notification (5s)") {
+                    NotificationManager.shared.sendTestNotification()
+                }
+                .buttonStyle(.borderedProminent)
             }
+            .padding()
             .navigationTitle("Settings")
         }
     }
