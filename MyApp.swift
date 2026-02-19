@@ -2,9 +2,7 @@ import SwiftUI
 
 @main
 struct MyApp: App {
-    
     @AppStorage("hasCompletedOnboarding") var hasCompletedOnboarding = false
-    
     var body: some Scene {
         WindowGroup {
             if hasCompletedOnboarding {
@@ -17,31 +15,26 @@ struct MyApp: App {
 }
 
 struct OnboardingView: View {
-    
     @AppStorage("hasCompletedOnboarding") var hasCompletedOnboarding = false
     @State private var currentStep = 0
-    
     var body: some View {
         VStack {
-            
             Spacer()
-            
             if currentStep == 0 {
                 WelcomeStep()
             }
-            
             if currentStep == 1 {
+                NameStep()
+            }
+            if currentStep == 2 {
                 AgeStep()
             }
-            
-            if currentStep == 2 {
+            if currentStep == 3 {
                 FocusStep()
             }
-            
             Spacer()
-            
             Button(action: nextStep) {
-                Text(currentStep == 2 ? "Finish" : "Continue")
+                Text(currentStep == 3 ? "Finish" : "Continue")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -53,12 +46,20 @@ struct OnboardingView: View {
         }
         .padding()
         .animation(.easeInOut, value: currentStep)
+        .onAppear {
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                if settings.authorizationStatus == .notDetermined {
+                    NotificationManager.shared.requestPermission()
+                }
+            }
+        }
     }
-    
+
     func nextStep() {
-        if currentStep < 2 {
+        if currentStep < 3 {
             currentStep += 1
-        } else {
+        }
+        else {
             hasCompletedOnboarding = true
         }
     }
@@ -77,9 +78,35 @@ struct WelcomeStep: View {
     }
 }
 
+struct NameStep: View {
+    
+    @AppStorage("userName") var name = ""
+    
+    var body: some View {
+        VStack(spacing: 30) {
+            Spacer()
+            Text("Please tell me your name")
+                .font(.title2)
+                .multilineTextAlignment(.center)
+            
+            TextField("Enter your name", text: $name)
+                .padding()
+                .frame(maxWidth: 300)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+                .multilineTextAlignment(.center)
+            Spacer()
+        }
+    }
+}
+
 struct AgeStep: View {
     
-    @State private var selectedAge = 45
+    @State var selectedAge = 45
     
     var body: some View {
         VStack(spacing: 20) {
@@ -93,15 +120,12 @@ struct AgeStep: View {
 }
 
 struct FocusStep: View {
-    
-    @State private var selectedFocus = ""
-    
+    @State var selectedFocus = ""
     var body: some View {
         VStack(spacing: 20) {
             Text("What would you like to focus on?")
                 .font(.title2)
                 .multilineTextAlignment(.center)
-            
             OptionButton(title: "Mental Health", selected: $selectedFocus)
             OptionButton(title: "Physical Health", selected: $selectedFocus)
             OptionButton(title: "Work-Life Balance", selected: $selectedFocus)
@@ -112,7 +136,6 @@ struct FocusStep: View {
 struct OptionButton: View {
     let title: String
     @Binding var selected: String
-    
     var body: some View {
         Button(action: {
             selected = title
