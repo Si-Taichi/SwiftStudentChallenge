@@ -38,7 +38,7 @@ struct DashboardView: View {
                 Text("Your daily summary will appear here.")
                     .foregroundColor(.gray)
             }
-            .navigationTitle("Dashboard")
+            .navigationTitle("Home")
         }
     }
 }
