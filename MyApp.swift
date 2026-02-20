@@ -30,11 +30,14 @@ struct OnboardingView: View {
                 AgeStep()
             }
             if currentStep == 3 {
+                HWStep()
+            }
+            if currentStep == 4 {
                 FocusStep()
             }
             Spacer()
             Button(action: nextStep) {
-                Text(currentStep == 3 ? "Finish" : "Continue")
+                Text(currentStep == 4 ? "Finish" : "Continue")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -54,9 +57,9 @@ struct OnboardingView: View {
             }
         }
     }
-
+    
     func nextStep() {
-        if currentStep < 3 {
+        if currentStep < 4 {
             currentStep += 1
         }
         else {
@@ -106,7 +109,7 @@ struct NameStep: View {
 
 struct AgeStep: View {
     
-    @State var selectedAge = 45
+    @AppStorage("userAge") var selectedAge = 45
     
     var body: some View {
         VStack(spacing: 20) {
@@ -119,8 +122,20 @@ struct AgeStep: View {
     }
 }
 
+struct HWStep: View {
+    @AppStorage("userHeight") var height = 170
+    @AppStorage("userWeight") var weight = 65
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("Your weight and height").font(.title)
+            Stepper("Weight : \(weight)", value: $weight, in: 40...120).padding()
+            Stepper("Height : \(height)", value: $height, in: 120...200).padding()
+        }
+    }
+}
+
 struct FocusStep: View {
-    @State var selectedFocus = ""
+    @AppStorage("userFocus") var selectedFocus = ""
     var body: some View {
         VStack(spacing: 20) {
             Text("What would you like to focus on?")
