@@ -29,20 +29,113 @@ struct ContentView: View {
 }
 
 struct DashboardView: View {
+    
     @AppStorage("userName") var name = ""
+    
+    @State private var questions: [Question] = []
+    @State private var showThankYou = false
+    @State private var currentPeriod: CheckInPeriod?
+    @State private var shouldShowQuestion = false
+        
     var body: some View {
         NavigationView {
-            VStack(spacing: 10) {
+            VStack(spacing: 25) {
+                
                 Text("Welcome Back, \(name)")
                     .font(.title)
-                Text("Your daily summary will appear here.")
+                
+                if shouldShowQuestion, let period = currentPeriod {
+                    
+                    Text(titleForPeriod(period))
+                        .font(.headline)
+                    
+                    ForEach(questions) { question in
+                        VStack(spacing: 12) {
+                            
+                            Text(question.text)
+                            
+                            ForEach(question.options) { option in
+                                Button {
+                                    saveMood(option.value, question: question.text, period: period)
+                                } label: {
+                                    Text(option.text)
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                        .background(Color.green.opacity(0.15))
+                                        .cornerRadius(12)
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    Text("You've completed your check-in for this period 💚")
+                        .foregroundColor(.gray)
+                }
+                
+            if showThankYou {
+                Text("Thanks for sharing 💚")
                     .foregroundColor(.gray)
             }
+            
+            Spacer()
+            }
+            .padding()
             .navigationTitle("Home")
+            .onAppear {
+                moodEntries = MoodManager.shared.loadEntries()
+                currentPeriod = CheckInPeriod.current()
+                
+                if let period = currentPeriod {
+                    shouldShowQuestion = !MoodManager.shared.hasAnsweredToday(for: period)
+                }
+            }
+        }
+    }
+    
+    func saveMood(_ value: String, question: String, period: CheckInPeriod) {
+        
+        let entry = MoodEntry(
+            date: Date(),
+            period: period.rawValue,
+            question: question,
+            value: value
+        )
+        
+        MoodManager.shared.saveEntry(entry)
+        
+        shouldShowQuestion = false
+    }
+
+    func titleForPeriod(_ period: CheckInPeriod) -> String {
+        switch period {
+        case .morning:
+            return "Good Morning ☀️ How are you feeling?"
+        case .afternoon:
+            return "Good Afternoon 🌤 How are you feeling?"
+        case .evening:
+            return "Good Evening 🌙 How are you feeling?"
         }
     }
 }
 
+struct MoodButton: View {
+    
+    var text: String
+    var color: Color
+    var action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(text)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(color.opacity(0.2))
+                .foregroundColor(color)
+                .cornerRadius(12)
+        }
+    }
+}
 
 struct MindView: View {
     var body: some View {
