@@ -32,6 +32,7 @@ struct DashboardView: View {
     
     @AppStorage("userName") var name = ""
     
+    @State private var moodEntries: [MoodEntry] = []
     @State private var questions: [Question] = []
     @State private var showThankYou = false
     @State private var currentPeriod: CheckInPeriod?
