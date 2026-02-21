@@ -1,0 +1,11 @@
+#QUESTION
+How are you feeling today?
+I'm feeling great!|good
+I'm fine.|neutral
+I'm not feeling good today.|bad
+
+#QUESTION
+How was your energy level?
+Full of energy!|high
+It was okay.|medium
+Very tired.|low
