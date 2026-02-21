@@ -5,7 +5,7 @@ class QuestionLoader {
     static func loadQuestions() -> [Question] {
         
         guard let url = Bundle.main.url(forResource: "questions", withExtension: "txt"),
-              let content = try? String(contentsOf: url) else {
+              let content = try? String(contentsOf: url, encoding: .utf8) else {
             print("Failed to load questions.txt")
             return []
         }
